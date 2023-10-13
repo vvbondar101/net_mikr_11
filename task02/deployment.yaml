@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mydeployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+      - name: multitool
+        image: wbitt/network-multitool
+        volumeMounts:
+        - name: vol01
+          mountPath: /dir
+        env:
+        - name: HTTP_PORT
+          value: '1180'
+        ports:
+        - containerPort: 1180
+      
+      volumes:
+      - name: vol01
+        persistentVolumeClaim:
+          claimName: pvc

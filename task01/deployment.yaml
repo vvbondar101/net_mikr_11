@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mydeployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+      - name: multitool
+        image: wbitt/network-multitool
+        volumeMounts:
+        - name: vol01
+          mountPath: /dir
+        env:
+        - name: HTTP_PORT
+          value: '1180'
+        command: ['/bin/sh']
+        args: ['-c', 'while true; do cat /dir/tmp.txt; sleep 5; done']
+        ports:
+        - containerPort: 1180
+      - name: busybox
+        image: busybox
+        volumeMounts:
+        - name: vol01
+          mountPath: /dir
+        command: ['/bin/sh']
+        args: ['-c', 'while true; do echo $(date) >> /dir/tmp.txt; sleep 5; done']
+        ports:
+        - containerPort: 80
+      volumes:
+      - name: vol01
+        persistentVolumeClaim:
+          claimName: pvc-vol
